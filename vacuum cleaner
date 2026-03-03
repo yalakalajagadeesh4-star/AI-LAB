@@ -1,0 +1,136 @@
+#VACCUM CLEANER
+import random
+
+environment = {
+    "A": random.choice(["Dirty", "Clean"]),
+    "B": random.choice(["Dirty", "Clean"])
+}
+
+visited = {"A": False, "B": False}
+current_location = "A"
+
+performance_table = []
+percept_action_table = []
+
+def calculate_percentages(env, visited):
+    total = len(env)
+    cleaned = sum(1 for loc in env if env[loc] == "Clean" and visited[loc])
+    not_cleaned = sum(1 for loc in env if env[loc] == "Dirty" and visited[loc])
+    pending = sum(1 for loc in visited if not visited[loc])
+
+    return {
+        "Cleaned": (cleaned / total) * 100,
+        "Not Cleaned": (not_cleaned / total) * 100,
+        "Pending": (pending / total) * 100
+    }
+
+for _ in range(2):
+
+    percept = f"Location {current_location}, {environment[current_location]}"
+    visited[current_location] = True
+
+    if environment[current_location] == "Dirty":
+        action = "Suck"
+        environment[current_location] = "Clean"
+        status = "Cleaned"
+    else:
+        action = "NoOp"
+        status = "Already Clean"
+
+    percept_action_table.append([percept, action, status])
+
+    # 🔹 UPDATE PERFORMANCE TABLE HERE
+    percentages = calculate_percentages(environment, visited)
+    performance_table.append([
+        f"A:{environment['A']} B:{environment['B']}",
+        f"Cleaned={percentages['Cleaned']:.0f}% "
+        f"NotCleaned={percentages['Not Cleaned']:.0f}% "
+        f"Pending={percentages['Pending']:.0f}%"
+    ])
+
+    previous_location = current_location
+    if current_location == "A":
+        current_location = "B"
+        move = "Right"
+    else:
+        current_location = "A"
+        move = "Left"
+
+    percept_action_table.append([f"Move from {previous_location}", move, "Moved"])
+
+
+print("\nINITIAL RANDOM ENVIRONMENT")
+for loc, state in environment.items():
+    print(f"Location {loc}: {state}")
+
+print("\nTABLE 1: PERFORMANCE STATUS TABLE")
+print("Performance\t\tStatus")
+for row in performance_table:
+    print(f"{row[0]}\t{row[1]}")
+
+print("\nTABLE 2: PERCEPT–ACTION TABLE")
+print("Percept\t\t\tAction\tStatus")
+for row in percept_action_table:
+    print(f"{row[0]}\t{row[1]}\t{row[2]}")
+
+
+advanced
+
+rooms = {}
+
+room_names = ["Kitchen", "Hall", "Bedroom-1", "Bedroom-2", "Store Room", "Terrace"]
+
+for room in room_names:
+    valid = False
+    while not valid:
+        parts = list(map(int, input(f"Enter 4 values for {room} (0=clean, 1=dirty) separated by space: ").split()))
+        if len(parts) == 4 and all(p in [0, 1] for p in parts):
+            rooms[room] = parts
+            valid = True
+        else:
+            print("Invalid input. Enter exactly four values (0 or 1).")
+
+def analyze(parts):
+    clean = parts.count(0)
+    dirty = parts.count(1)
+    total = len(parts)
+    pending = dirty
+    return clean * 100 / total, dirty * 100 / total, pending * 100 / total
+
+print("\nPERFORMANCE TABLE")
+print("Room\t\tStatus\t\tClean%\tDirty%\tPending%")
+
+for room, parts in rooms.items():
+    c, d, p = analyze(parts)
+    status = "Cleaned" if d == 0 else "Not Cleaned"
+    print(f"{room:12}\t{status:10}\t{c:5.1f}\t{d:5.1f}\t{p:5.1f}")
+
+print("\nVACUUM CLEANER LOCATION TABLE")
+print("Location\tStatus\t\tPercentage")
+
+for room, parts in rooms.items():
+    sections = {
+        "Left": [parts[0]],
+        "Center": parts[1:3],
+        "Right": [parts[3]]
+    }
+    for loc, data in sections.items():
+        clean = data.count(0)
+        total = len(data)
+        status = "Clean" if clean == total else "Dirty"
+        pct = clean * 100 / total
+        print(f"{loc:7}\t\t{status:5}\t\t{pct:5.1f}")
+
+for room in rooms:
+    rooms[room] = [0, 0, 0, 0]
+
+print("\nPERCEPT SEQUENCE TABLE")
+print("Percept\t\tAction\t\tStatus")
+
+for room in rooms:
+    print(f"{room:12}\tSUCK\t\tCleaned")
+
+print("\nAll rooms are cleaned.")
+print("Thank you for using BUNTY – The Vacuum Cleaner Agent")
+
+
