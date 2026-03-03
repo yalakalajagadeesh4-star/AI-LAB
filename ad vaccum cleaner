@@ -1,0 +1,74 @@
+#ADVANCED VACCUM CLEANER
+import heapq
+
+class Node:
+    def __init__(self, name, cost, parent=None):
+        self.name = name
+        self.cost = cost
+        self.parent = parent
+
+    def __lt__(self, other):
+        return self.cost < other.cost
+
+
+def uniform_cost_search(start, goal, tree):
+    frontier = []
+    explored = set()
+
+    heapq.heappush(frontier, Node(start, 0))
+
+    while frontier:
+        current_node = heapq.heappop(frontier)
+
+        if current_node.name == goal:
+            return reconstruct_path(current_node)
+
+        if current_node.name in explored:
+            continue
+
+        explored.add(current_node.name)
+
+        for child, step_cost in tree.get(current_node.name, []):
+            if child not in explored:
+                total_cost = current_node.cost + step_cost
+                heapq.heappush(
+                    frontier,
+                    Node(child, total_cost, current_node)
+                )
+
+    return None
+
+
+def reconstruct_path(node):
+    path = []
+    while node:
+        path.append((node.name, node.cost))
+        node = node.parent
+    return path[::-1]
+
+
+tree = {
+    "A": [("B", 2), ("C", 3)],
+    "B": [("D", 4), ("E", 1)],
+    "C": [("F", 6), ("G", 5)],
+    "D": [("H", 3), ("I", 2)],
+    "E": [("J", 4), ("K", 6)],
+    "F": [("L", 3), ("M", 2)],
+    "G": [("N", 4), ("O", 1)],
+    "H": [("P", 2), ("Q", 3)],
+    "I": [("R", 5), ("S", 4)],
+    "P": [("T", 2), ("U", 3)],
+    "Q": [("V", 1), ("W", 4)],
+    "R": [("X", 2)],
+    "S": [("Y", 3)],
+    "T": [("Z", 2)]
+}
+
+start_node = "A"
+goal_node = "Z"
+
+solution = uniform_cost_search(start_node, goal_node, tree)
+
+print("Optimal Path (Node, Path Cost):")
+for node, cost in solution:
+    print(node, "->", cost)
