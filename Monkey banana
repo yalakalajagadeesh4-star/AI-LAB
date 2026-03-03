@@ -1,0 +1,73 @@
+# Monkey–Banana Problem
+room = [
+    [1, 2, 3],
+    [4, 5, 6],
+    [7, 8, 9]
+]
+
+monkeyPos = None
+boxPos = None
+bananaPos = None
+onBox = False
+hasBanana = False
+
+def enterRoom():
+    global monkeyPos, boxPos, bananaPos
+    print(f"Monkey enters the room at location {monkeyPos}")
+    print(f"Box is at location {boxPos}")
+    print(f"Banana is at location {bananaPos}")
+def moveTo(frm, to):
+    global monkeyPos
+    print(f"Monkey moves from {frm} to {to}")
+    monkeyPos = to
+
+def pushBox():
+    global boxPos
+    print(f"Monkey pushes box from {boxPos} to {bananaPos}")
+    boxPos = bananaPos
+
+def climbBox():
+    global onBox
+    print("Monkey climbs the box")
+    onBox = True
+
+def grabBanana():
+    global hasBanana
+    print("Monkey grabs the banana")
+    hasBanana = True
+
+
+def intelligentAgent():
+    global monkeyPos, boxPos, bananaPos, onBox, hasBanana
+
+    enterRoom()
+
+    while not hasBanana:
+
+        if monkeyPos != bananaPos:
+            moveTo(monkeyPos, bananaPos)
+            monkeyPos = bananaPos
+
+        elif boxPos != bananaPos:
+            moveTo(monkeyPos, boxPos)
+            pushBox()
+
+        elif not onBox:
+            climbBox()
+
+        else:
+            grabBanana()
+
+    print("Monkey exits room successfully!")
+
+
+if __name__ == "__main__":
+    print("Room layout:")
+    for row in room:
+        print(" ".join(map(str, row)))
+
+    monkeyPos = int(input("Enter monkey entry position (choose from matrix): "))
+    boxPos = int(input("Enter box position (choose from matrix): "))
+    bananaPos = int(input("Enter banana position (choose from matrix): "))
+
+    intelligentAgent()
