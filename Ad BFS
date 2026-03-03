@@ -1,0 +1,100 @@
+#ADVANCED BFS
+from collections import deque
+
+def shortestPathBinaryMatrix(grid, start, end):
+    """
+    Finds the shortest path from 'start' to 'end' in a binary matrix using BFS.
+
+    Args:
+        grid (list[list[int]]): The binary matrix where 0 is traversable, 1 is an obstacle.
+        start (tuple): A tuple (row, col) representing the starting coordinates.
+        end (tuple): A tuple (row, col) representing the ending coordinates.
+
+    Returns:
+        int: The length of the shortest path, or -1 if no path exists.
+    """
+    rows = len(grid)
+    cols = len(grid[0])
+
+    start_row, start_col = start
+    end_row, end_col = end
+
+    # Check if start or end are obstacles or out of bounds
+    if not (0 <= start_row < rows and 0 <= start_col < cols) or grid[start_row][start_col] == 1:
+        return -1
+    if not (0 <= end_row < rows and 0 <= end_col < cols) or grid[end_row][end_col] == 1:
+        return -1
+
+    # If start and end are the same, path length is 1
+    if start == end:
+        return 1
+
+    # Queue for BFS: stores (row, col, distance)
+    queue = deque([(start_row, start_col, 1)]) # Start at distance 1
+
+    # Keep track of visited cells to avoid cycles and redundant processing
+    visited = set()
+    visited.add((start_row, start_col))
+
+    # 8 possible directions (up, down, left, right, and diagonals)
+    directions = [
+        (-1, 0), (1, 0), (0, -1), (0, 1),  # Cardinal directions
+        (-1, -1), (-1, 1), (1, -1), (1, 1)  # Diagonal directions
+    ]
+
+    while queue:
+        r, c, dist = queue.popleft()
+
+        for dr, dc in directions:
+            nr, nc = r + dr, c + dc
+
+            # Check if the new cell is within bounds, not an obstacle, and not visited
+            if 0 <= nr < rows and 0 <= nc < cols and grid[nr][nc] == 0 and (nr, nc) not in visited:
+
+                # If we reached the destination
+                if (nr, nc) == end:
+                    return dist + 1
+
+                visited.add((nr, nc))
+                queue.append((nr, nc, dist + 1))
+
+    # If the queue becomes empty and destination is not reached
+    return -1
+
+# --- Example Usage ---
+# Define a sample grid
+grid1 = [
+    [0, 0, 0],
+    [1, 1, 0],
+    [1, 1, 0]
+]
+start1 = (0, 0)
+end1 = (2, 2)
+print(f"Shortest path in grid1 from {start1} to {end1}: {shortestPathBinaryMatrix(grid1, start1, end1)}")
+
+grid2 = [
+    [0, 0, 0, 0],
+    [1, 0, 1, 0],
+    [0, 0, 0, 0],
+    [0, 1, 0, 0]
+]
+start2 = (0, 0)
+end2 = (3, 3)
+print(f"Shortest path in grid2 from {start2} to {end2}: {shortestPathBinaryMatrix(grid2, start2, end2)}")
+
+grid3 = [
+    [0, 1],
+    [1, 0]
+]
+start3 = (0, 0)
+end3 = (1, 1)
+print(f"Shortest path in grid3 from {start3} to {end3}: {shortestPathBinaryMatrix(grid3, start3, end3)}")
+
+grid4 = [
+    [0, 0, 0],
+    [1, 1, 0],
+    [1, 1, 1]
+]
+start4 = (0, 0)
+end4 = (2, 2)
+print(f"Shortest path in grid4 from {start4} to {end4}: {shortestPathBinaryMatrix(grid4, start4, end4)}")
